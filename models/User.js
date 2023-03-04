@@ -1,25 +1,40 @@
-const mongoose = require('mongoose');
-
+const mongoose = require("mongoose");
+const bcrypt = require("bcryptjs");
+const jwt = require('jsonwebtoken')
 
 const UserSchema = new mongoose.Schema({
     name: {
         type: String,
-        required: [true, 'please provide name'],
+        required: [true, "please provide name"],
         minlength: 3,
-        maxlength: 30
+        maxlength: 30,
     },
     email: {
         type: String,
-        required: [true, 'please provide email'],
-        match: [/^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/, 'please provide valid email'],
-        unique: true
+        required: [true, "please provide email"],
+        match: [
+            /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
+            "please provide valid email",
+        ],
+        unique: true,
     },
     password: {
         type: String,
-        required: [true, 'please provide password'],
+        required: [true, "please provide password"],
         minlength: 6,
+    },
+});
 
-    }
-})
+UserSchema.pre("save", async function() {
+    const salt = await bcrypt.genSalt(10);
+    this.password = await bcrypt.hash(this.password, salt);
+});
+UserSchema.methods.getName = function() {
+    return this.name
+}
+UserSchema.methods.getJWT = function() {
+    return jwt.sign({ userId: this._id, name: this.name }, 'jwt_secrets', { expiresIn: '30d' });
 
-module.exports = mongoose.model('User', UserSchema)
+}
+
+module.exports = mongoose.model("User", UserSchema);
