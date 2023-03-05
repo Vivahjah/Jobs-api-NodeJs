@@ -33,7 +33,7 @@ UserSchema.methods.getName = function() {
     return this.name
 }
 UserSchema.methods.getJWT = function() {
-    return jwt.sign({ userId: this._id, name: this.name }, 'jwt_secrets', { expiresIn: '30d' });
+    return jwt.sign({ userId: this._id, name: this.name }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_LIFETIME });
 
 }
 
