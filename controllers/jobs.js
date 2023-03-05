@@ -1,11 +1,11 @@
 const getAllJobs = (req, res) => {
-    res.send('get all Jobs')
+    res.json(req.user)
 }
 const getJob = (req, res) => {
     res.send('get single Job')
 }
 const createJob = (req, res) => {
-    res.send('create Job')
+    res.json(req.body)
 }
 const updateJob = (req, res) => {
     res.send('update Job')
